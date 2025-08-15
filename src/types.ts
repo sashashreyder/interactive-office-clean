@@ -11,14 +11,16 @@ export interface GameState {
 }
 
 export interface Question {
-  id: number;
-  type: QuestionType;
-  difficulty: Difficulty;
-  question: string;
-  options: string[];
-  correctAnswer: string;
-  explanation: string;
-  explanationRu: string;
-  points: number;
-  category: string;
-}
+    id: number;
+    type: "vocabulary" | "grammar" | "critical_thinking";
+    difficulty: "beginner" | "intermediate";
+    question: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+    explanationRu: string;
+    points: number;
+    category: string;
+    hintRu?: string; 
+  }
+  
