@@ -17,7 +17,7 @@ const ProgressTracker: React.FC<Props> = ({ gameState }) => {
         <span className="text-xl">📊</span> Ваш прогресс
       </h3>
 
-      {/* Прогресс-бар */}
+
       <div className="mb-4">
         <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
           <div
@@ -30,7 +30,7 @@ const ProgressTracker: React.FC<Props> = ({ gameState }) => {
         </p>
       </div>
 
-      {/* Цифры */}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-xl bg-white/10 backdrop-blur-xl ring-1 ring-white/10 p-3 text-center">
           <span className="block text-2xl font-bold text-white">{level}</span>

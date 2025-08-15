@@ -79,7 +79,7 @@ const App: React.FC = () => {
     }
   };
 
-  /* ---------- Шапка (glass) ---------- */
+
   const Header = () => (
     <div className="relative z-10 text-center mb-10">
       <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full
@@ -94,14 +94,14 @@ const App: React.FC = () => {
         Лексика • Грамматика • Критическое мышление • Общение
       </p>
 
-      {/* стеклянный прогресс */}
+
       <div className="mt-5">
         <ProgressTracker gameState={gameState} />
       </div>
     </div>
   );
 
-  /* ---------- Карточки (glass) ---------- */
+
   const Card = ({
     children,
     accent,
@@ -136,9 +136,9 @@ const App: React.FC = () => {
           "overflow-hidden"
         ].join(" ")}
       >
-        {/* акцентная ленточка слева */}
+
         <span className={`absolute inset-y-0 left-0 w-1 ${left}`} />
-        {/* мягкий блик */}
+
         <span className="pointer-events-none absolute inset-0 -left-full hover:left-full transition-[left] duration-700 ease-linear
                          before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-r
                          before:from-transparent before:via-white/15 before:to-transparent" />
@@ -211,7 +211,6 @@ const App: React.FC = () => {
     </div>
   );
 
-  /* ---------- Help секция (оставил светлой, можно тоже «glass» при желании) ---------- */
   const renderHelpSection = () => (
     <div className="max-w-[1200px] mx-auto overflow-hidden rounded-[15px] shadow-[0_8px_32px_rgba(0,0,0,.28)] bg-white/10 text-slate-100 ring-1 ring-white/15 backdrop-blur-xl relative z-10">
       <div className="bg-gradient-to-r from-teal-500 to-emerald-600 text-white px-6 py-5 flex items-center justify-between">
@@ -412,7 +411,6 @@ const App: React.FC = () => {
 
   return (
     <div className="app min-h-screen p-5 sm:p-6 md:p-8 relative text-white">
-      {/* ФОН — как есть */}
       <div className="bg">
         <div className="blob b1" />
         <div className="blob b2" />
