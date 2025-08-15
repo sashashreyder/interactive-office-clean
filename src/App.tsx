@@ -1,16 +1,23 @@
+
 import React, { useState } from "react";
 import "./App.css";
 
-
-import QuizGame from "./components/QuizGame.tsx";
-import BossChallenge from "./components/BossChallenge.tsx";
-import ClientMeeting from "./components/ClientMeeting.tsx";
-import ProgressTracker from "./components/ProgressTracker.tsx";
+import QuizGame from "./components/QuizGame";
+import BossChallenge from "./components/BossChallenge";
+import ClientMeeting from "./components/ClientMeeting";
+import ProgressTracker from "./components/ProgressTracker";
+import ExerciseSelector from "./components/ExerciseSelector";
 
 import type { GameState } from "./types";
-import { vocabularyQuestions } from "./data/vocabulary";
-import { grammarQuestions } from "./data/grammar";
 import { criticalThinkingQuestions } from "./data/critical";
+
+import { vocabulary1 } from "./data/vocabulary1";
+import { vocabulary2 } from "./data/vocabulary2";
+import { vocabulary3 } from "./data/vocabulary3";
+
+import { grammar1 } from "./data/grammar1";
+import { grammar2 } from "./data/grammar2";
+import { grammar3 } from "./data/grammar3";
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -22,11 +29,14 @@ const App: React.FC = () => {
     correctAnswers: 0,
   });
 
+  // выбор внутри разделов
+  const [selectedVocab, setSelectedVocab] = useState<string | null>(null);
+  const [selectedGrammar, setSelectedGrammar] = useState<string | null>(null);
+
   const [showHelp, setShowHelp] = useState(false);
 
   const handleAnswer = (isCorrect: boolean, points: number) => {
     const gained = isCorrect ? points : 0;
-
     setGameState((prev) => {
       const experience = prev.experience + gained;
       return {
@@ -49,6 +59,8 @@ const App: React.FC = () => {
       totalQuestions: 0,
       correctAnswers: 0,
     });
+    setSelectedVocab(null);
+    setSelectedGrammar(null);
   };
 
   const renderHelpSection = () => (
@@ -60,11 +72,14 @@ const App: React.FC = () => {
       <div className="help-content">
         <div className="help-card">
           <h3>🎯 Лексика</h3>
-          <p>Бизнес-центр, менеджмент, клиенты, административные задачи, стратегия.</p>
+          <p>Business Center • Management & Customers • Strategy & Admin.</p>
         </div>
         <div className="help-card">
           <h3>✏️ Грамматика</h3>
-          <p>Will, going to, Present Continuous, would like to, need/want, demonstratives, imperatives, модальные, there is/are, countable/uncountable, possessives.</p>
+          <p>
+            Will / Going to • Present Continuous • Would like / Need / Want • Demonstratives •
+            Imperatives • Modals • There is/are • Countable/Uncountable • Possessives.
+          </p>
         </div>
         <div className="help-card">
           <h3>🧠 Критическое мышление</h3>
@@ -90,7 +105,7 @@ const App: React.FC = () => {
         >
           <div className="card-icon">📚</div>
           <h3>Практика Лексики</h3>
-          <p>Бизнес-центр, менеджмент, клиенты и др.</p>
+          <p>Vocabulary 1 / 2 / 3</p>
         </button>
 
         <button
@@ -99,7 +114,7 @@ const App: React.FC = () => {
         >
           <div className="card-icon">✏️</div>
           <h3>Практика Грамматики</h3>
-          <p>Will, PC vs PS, There is/are и др.</p>
+          <p>Grammar 1 / 2 / 3</p>
         </button>
 
         <button
@@ -174,26 +189,95 @@ const App: React.FC = () => {
     </div>
   );
 
+  // helpers
+  const getVocabQuestions = () => {
+    switch (selectedVocab) {
+      case "vocab1":
+        return vocabulary1;
+      case "vocab2":
+        return vocabulary2;
+      case "vocab3":
+        return vocabulary3;
+      default:
+        return [];
+    }
+  };
+
+  const getGrammarQuestions = () => {
+    switch (selectedGrammar) {
+      case "grammar1":
+        return grammar1;
+      case "grammar2":
+        return grammar2;
+      case "grammar3":
+        return grammar3;
+      default:
+        return [];
+    }
+  };
+
   const renderContent = () => {
     if (showHelp) return renderHelpSection();
 
     switch (gameState.currentMode) {
-      case "vocabulary":
+      case "vocabulary": {
+        if (!selectedVocab) {
+          return (
+            <ExerciseSelector
+              title="Выберите упражнение по лексике"
+              items={[
+                { key: "vocab1", label: "📘 Vocabulary 1 — Business Center" },
+                { key: "vocab2", label: "📗 Vocabulary 2 — Management & Customers" },
+                { key: "vocab3", label: "📙 Vocabulary 3 — Strategy & Admin" },
+              ]}
+              onSelect={(key: string) => setSelectedVocab(key)}
+
+              onBack={() => setGameState((p) => ({ ...p, currentMode: "main" }))}
+            />
+          );
+        }
+
         return (
           <QuizGame
-            questions={vocabularyQuestions}
+            questions={getVocabQuestions()}
             onAnswer={handleAnswer}
-            onBack={() => setGameState((p) => ({ ...p, currentMode: "main" }))}
+            onBack={() => setSelectedVocab(null)}
           />
         );
-      case "grammar":
+      }
+
+      case "grammar": {
+        if (!selectedGrammar) {
+          return (
+            <ExerciseSelector
+              title="Выберите раздел грамматики"
+              items={[
+                { key: "grammar1", label: "✏️ Grammar 1 — Will / Going to / Present Continuous" },
+                {
+                  key: "grammar2",
+                  label: "✏️ Grammar 2 — Would like · Need/Want · Demonstratives · Imperatives",
+                },
+                {
+                  key: "grammar3",
+                  label: "✏️ Grammar 3 — Modals · There is/are · Count/Uncount · Possessives",
+                },
+              ]}
+              onSelect={(key: string) => setSelectedVocab(key)}
+
+              onBack={() => setGameState((p) => ({ ...p, currentMode: "main" }))}
+            />
+          );
+        }
+
         return (
           <QuizGame
-            questions={grammarQuestions}
+            questions={getGrammarQuestions()}
             onAnswer={handleAnswer}
-            onBack={() => setGameState((p) => ({ ...p, currentMode: "main" }))}
+            onBack={() => setSelectedGrammar(null)}
           />
         );
+      }
+
       case "critical_thinking":
         return (
           <QuizGame
@@ -202,8 +286,10 @@ const App: React.FC = () => {
             onBack={() => setGameState((p) => ({ ...p, currentMode: "main" }))}
           />
         );
+
       case "communication":
         return renderCommunicationMenu();
+
       case "boss":
         return (
           <BossChallenge
@@ -211,6 +297,7 @@ const App: React.FC = () => {
             onBack={() => setGameState((p) => ({ ...p, currentMode: "communication" }))}
           />
         );
+
       case "client":
         return (
           <ClientMeeting
@@ -218,6 +305,7 @@ const App: React.FC = () => {
             onBack={() => setGameState((p) => ({ ...p, currentMode: "communication" }))}
           />
         );
+
       default:
         return renderMainMenu();
     }
@@ -227,3 +315,5 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+
