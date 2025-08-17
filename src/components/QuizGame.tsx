@@ -11,6 +11,7 @@ interface Question {
   explanationRu: string;
   points: number;
   category: string;
+  hintRu?: string;
 }
 
 interface QuizGameProps {
@@ -19,206 +20,169 @@ interface QuizGameProps {
   onBack: () => void;
 }
 
+const typeBadge = (t: string) => {
+  switch (t) {
+    case "vocabulary":        return { icon: "📚", label: "Лексика",               cls: "bg-sky-500" };
+    case "grammar":           return { icon: "✏️", label: "Грамматика",            cls: "bg-rose-500" };
+    case "critical_thinking": return { icon: "🧠", label: "Критическое мышление",  cls: "bg-violet-500" };
+    case "scenario":          return { icon: "💬", label: "Сценарий",              cls: "bg-amber-500" };
+    default:                  return { icon: "❓", label: "Вопрос",                 cls: "bg-slate-500" };
+  }
+};
+
 const QuizGame: React.FC<QuizGameProps> = ({ questions, onAnswer, onBack }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [showRussian, setShowRussian] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  if (!questions.length) {
+    return (
+      <div className="rounded-2xl bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-white text-center">
+        Нет вопросов.
+        <button onClick={onBack} className="mt-4 px-4 py-2 rounded-lg bg-slate-500/80 hover:bg-slate-500">
+          Вернуться
+        </button>
+      </div>
+    );
+  }
+
+  const q = questions[currentQuestionIndex];
+  const isLast = currentQuestionIndex === questions.length - 1;
+  const badge = typeBadge(q.type);
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
     setShowExplanation(true);
     setShowRussian(false);
-    
-    const isCorrect = answer === currentQuestion.correctAnswer;
-    onAnswer(isCorrect, currentQuestion.points, currentQuestion.type);
+    setShowHint(false);
+    onAnswer(answer === q.correctAnswer, q.points, q.type);
   };
 
-  const handleNextQuestion = () => {
-    if (isLastQuestion) {
-      // Quiz completed
-      return;
-    }
-    
-    setCurrentQuestionIndex(prev => prev + 1);
+  const handleNext = () => {
+    if (isLast) return;
+    setCurrentQuestionIndex(i => i + 1);
     setSelectedAnswer(null);
     setShowExplanation(false);
     setShowRussian(false);
+    setShowHint(false);
   };
-
-  const handleFinishQuiz = () => {
-    onBack();
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "vocabulary": return "📚";
-      case "grammar": return "✏️";
-      case "critical_thinking": return "🧠";
-      default: return "❓";
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "vocabulary": return "#3498db";
-      case "grammar": return "#e74c3c";
-      case "critical_thinking": return "#9b59b6";
-      default: return "#95a5a6";
-    }
-  };
-
-  const getTypeName = (type: string) => {
-    switch (type) {
-      case "vocabulary": return "Лексика";
-      case "grammar": return "Грамматика";
-      case "critical_thinking": return "Критическое Мышление";
-      default: return "Вопрос";
-    }
-  };
-
-  const getCategoryName = (category: string) => {
-    const categoryMap: { [key: string]: string } = {
-      "Office Items": "Офисные предметы",
-      "People": "Люди",
-      "Workplace Actions": "Рабочие действия",
-      "Present Simple": "Настоящее время",
-      "Articles": "Артикли",
-      "Demonstratives": "Указательные местоимения",
-      "There is/There are": "There is/There are",
-      "Modal Verbs": "Модальные глаголы",
-      "Future Tense": "Будущее время",
-      "Present Continuous": "Настоящее продолженное",
-      "Would like to": "Would like to",
-      "Countable/Uncountable": "Исчисляемые/Неисчисляемые",
-      "Possessive Pronouns": "Притяжательные местоимения",
-      "Customer Service": "Обслуживание клиентов",
-      "Communication": "Общение",
-      "Professional Behavior": "Профессиональное поведение",
-      "Teamwork": "Командная работа"
-    };
-    
-    return categoryMap[category] || category;
-  };
-
-  if (currentQuestionIndex >= questions.length) {
-    return (
-      <div className="quiz-game">
-        <div className="quiz-header">
-          <h2>🎉 Викторина завершена!</h2>
-          <p>Отличная работа! Вы ответили на все вопросы.</p>
-        </div>
-        
-        <div className="quiz-controls">
-          <button onClick={handleFinishQuiz} className="quiz-btn">
-            Вернуться в главное меню
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="quiz-game">
-      <div className="quiz-header">
-        <h2>Вопрос {currentQuestionIndex + 1} из {questions.length}</h2>
-        <p>Выберите правильный ответ</p>
-        
-        <div className="question-type-badge" style={{ backgroundColor: getTypeColor(currentQuestion.type) }}>
-          {getTypeIcon(currentQuestion.type)} {getTypeName(currentQuestion.type)}
+    <div className="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 text-white max-w-3xl mx-auto shadow-[0_10px_30px_rgba(0,0,0,.25)]">
+      {/* заголовок */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">
+            Вопрос {currentQuestionIndex + 1} из {questions.length}
+          </h2>
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${badge.cls}`}>
+            <span>{badge.icon}</span> {badge.label}
+          </div>
         </div>
-        
-        <div className="question-category">
-          Категория: {getCategoryName(currentQuestion.category)}
-        </div>
+        <p className="text-slate-300 text-sm mt-1">Категория: {q.category}</p>
       </div>
 
-      <div className="question-container">
-        <div className="question">
-          {currentQuestion.question}
-        </div>
+      {/* вопрос */}
+      <div className="mb-4 text-base md:text-lg font-medium leading-snug">{q.question}</div>
 
-        <div className="options-grid">
-          {currentQuestion.options.map((option, index) => (
+      {/* варианты */}
+      <div className="grid gap-3 mb-4">
+        {q.options.map((opt, idx) => {
+          const isCorrect = opt === q.correctAnswer;
+          const isSelected = opt === selectedAnswer;
+          const base = "px-4 py-3 rounded-lg text-left transition";
+          const idle = "bg-white/10 hover:bg-white/20";
+          const after =
+            isCorrect ? "bg-emerald-500/90 text-white"
+            : isSelected ? "bg-rose-500/90 text-white"
+            : "bg-white/10";
+          return (
             <button
-              key={index}
-              onClick={() => handleAnswerSelect(option)}
+              key={idx}
+              onClick={() => handleAnswerSelect(opt)}
               disabled={showExplanation}
-              className={`option-btn ${
-                showExplanation
-                  ? option === currentQuestion.correctAnswer
-                    ? "correct"
-                    : option === selectedAnswer
-                    ? "incorrect"
-                    : ""
-                  : ""
-              }`}
+              className={`${base} ${showExplanation ? after : idle}`}
             >
-              {option}
+              {opt}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
+      {/* подсказка */}
+      {q.hintRu && !showExplanation && (
+        <button onClick={() => setShowHint(true)} className="text-sm text-amber-300 underline">
+          💡 Подсказка
+        </button>
+      )}
+
+      {/* объяснение */}
       {showExplanation && (
-        <div className="explanation">
-          <h4>
-            {selectedAnswer === currentQuestion.correctAnswer ? "✅ Правильно!" : "❌ Неправильно"}
+        <div className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10">
+          <h4 className="font-semibold mb-2">
+            {selectedAnswer === q.correctAnswer ? "✅ Правильно!" : "❌ Неправильно"}
           </h4>
-          
-          <div className="explanation-content">
-            <div className="explanation-english">
-              <strong>Объяснение:</strong>
-              <p>{currentQuestion.explanation}</p>
+          <p className="mb-3 text-slate-100/90">{q.explanation}</p>
+
+          <button
+            onClick={() => setShowRussian(v => !v)}
+            className="px-3 py-1 rounded-full bg-teal-500/80 hover:bg-teal-500 text-white text-xs"
+          >
+            {showRussian ? "Скрыть перевод" : "Показать перевод"}
+          </button>
+
+          {showRussian && (
+            <div className="mt-3 p-3 rounded bg-white/10 border border-white/10 text-slate-100/90">
+              {q.explanationRu}
             </div>
-            
-            <div className="explanation-russian">
-              <button 
-                onClick={() => setShowRussian(!showRussian)} 
-                className="russian-toggle-btn"
-              >
-                {showRussian ? "Скрыть перевод" : "Показать перевод на русский"}
-              </button>
-              
-              {showRussian && (
-                <div className="russian-text">
-                  <strong>Перевод:</strong>
-                  <p>{currentQuestion.explanationRu}</p>
-                </div>
-              )}
-            </div>
-            
-            <div className="points-info">
-              {selectedAnswer === currentQuestion.correctAnswer ? (
-                <span className="points-earned">
-                  +{currentQuestion.points} очков опыта
-                </span>
-              ) : (
-                <span className="points-lost">
-                  0 очков (неправильный ответ)
-                </span>
-              )}
-            </div>
+          )}
+
+          <div className="mt-3 font-semibold">
+            {selectedAnswer === q.correctAnswer ? `+${q.points} очков опыта` : "0 очков"}
           </div>
         </div>
       )}
 
-      <div className="quiz-controls">
-        <button onClick={onBack} className="quiz-btn secondary">
-          Назад в меню
+      {/* навигация */}
+      <div className="mt-6 flex justify-between">
+        <button onClick={onBack} className="px-4 py-2 rounded-lg bg-slate-500/80 hover:bg-slate-500">
+          Назад
         </button>
-        
         {showExplanation && (
-          <button onClick={handleNextQuestion} className="quiz-btn">
-            {isLastQuestion ? "Завершить викторину" : "Следующий вопрос"}
+          <button
+            onClick={isLast ? onBack : handleNext}
+            className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600"
+          >
+            {isLast ? "Завершить" : "Следующий вопрос"}
           </button>
         )}
       </div>
+
+      {/* модал подсказки */}
+      {showHint && q.hintRu && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowHint(false)}
+        >
+          <div
+            className="bg-slate-900/90 p-6 rounded-xl text-white max-w-sm w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="font-semibold mb-2">Подсказка</div>
+            <div>{q.hintRu}</div>
+            <button className="mt-4 px-3 py-1 bg-indigo-500 rounded-lg" onClick={() => setShowHint(false)}>
+              Понятно
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default QuizGame;
+
+
+
