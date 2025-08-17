@@ -34,9 +34,9 @@ const App: React.FC = () => {
   const [selectedGrammar, setSelectedGrammar] = useState<GrammarKey | null>(null);
   const [showHelp, setShowHelp] = useState(false);
 
-  const handleAnswer = (isCorrect: boolean, points: number) => {
+  const handleAnswer = (isCorrect: boolean, points: number, _type?: string) => {
     const gained = isCorrect ? points : 0;
-    setGameState((prev) => {
+    setGameState(prev => {
       const experience = prev.experience + gained;
       return {
         ...prev,
@@ -47,7 +47,7 @@ const App: React.FC = () => {
         correctAnswers: prev.correctAnswers + (isCorrect ? 1 : 0),
       };
     });
-  };
+  };  
 
   const resetGame = () => {
     setGameState({
