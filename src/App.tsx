@@ -4,7 +4,7 @@ import "./App.css";
 import QuizGame from "./components/QuizGame";
 import BossChallenge from "./components/BossChallenge";
 import ClientMeeting from "./components/ClientMeeting";
-import ProgressTracker from "./components/ProgressTracker";
+// import ProgressTracker from "./components/ProgressTracker";
 import ExerciseSelector from "./components/ExerciseSelector";
 
 import Header from "./components/Header";
@@ -24,6 +24,18 @@ import { grammar3 } from "./data/grammar3";
 type VocabKey = "vocab1" | "vocab2" | "vocab3";
 type GrammarKey = "grammar1" | "grammar2" | "grammar3";
 
+// Small reusable wrapper for page content
+const ContentWrapper: React.FC<{ children: React.ReactNode; narrow?: boolean }> = ({ children, narrow }) => (
+  <div className="px-4">
+    <div
+      className={`mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100 
+                  ${narrow ? "max-w-[800px]" : "max-w-[1200px]"}`}
+    >
+      {children}
+    </div>
+  </div>
+);
+
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>({
     currentMode: "main",
@@ -38,6 +50,7 @@ const App: React.FC = () => {
   const [selectedGrammar, setSelectedGrammar] = useState<GrammarKey | null>(null);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Update state after each answer
   const handleAnswer = (isCorrect: boolean, points: number) => {
     const gained = isCorrect ? points : 0;
     setGameState(prev => {
@@ -53,6 +66,7 @@ const App: React.FC = () => {
     });
   };
 
+  // Reset all progress
   const resetGame = () => {
     setGameState({
       currentMode: "main",
@@ -66,6 +80,7 @@ const App: React.FC = () => {
     setSelectedGrammar(null);
   };
 
+  // Select vocab set
   const getVocabQuestions = () => {
     switch (selectedVocab) {
       case "vocab1": return vocabulary1;
@@ -75,6 +90,7 @@ const App: React.FC = () => {
     }
   };
 
+  // Select grammar set
   const getGrammarQuestions = () => {
     switch (selectedGrammar) {
       case "grammar1": return grammar1;
@@ -84,6 +100,7 @@ const App: React.FC = () => {
     }
   };
 
+  // Main content rendering
   const renderContent = () => {
     if (showHelp) return <HelpSection onClose={() => setShowHelp(false)} />;
 
@@ -91,79 +108,71 @@ const App: React.FC = () => {
       case "vocabulary":
         if (!selectedVocab) {
           return (
-            <div className="px-4">
-              <div className="max-w-[1200px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-                <ExerciseSelector
-                  title="Выберите упражнение по лексике"
-                  items={[
-                    { key: "vocab1", label: "📘 Vocabulary 1 — Business Center" },
-                    { key: "vocab2", label: "📗 Vocabulary 2 — Management & Customers" },
-                    { key: "vocab3", label: "📙 Vocabulary 3 — Strategy & Admin" },
-                  ]}
-                  onSelect={(key: VocabKey) => setSelectedVocab(key)}
-                  onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
-                />
-              </div>
-            </div>
+            <ContentWrapper>
+              <ExerciseSelector
+               title="Выберите упражнение по лексике"
+               items={[
+               { key: "vocab1", label: "Vocabulary 1 — Business Center", icon: "📘" },
+               { key: "vocab2", label: "Vocabulary 2 — Management & Customers", icon: "📗" },
+               { key: "vocab3", label: "Vocabulary 3 — Strategy & Admin", icon: "📙" },
+               ]}
+               onSelect={(key: VocabKey) => setSelectedVocab(key)}
+               onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
+               />
+
+            </ContentWrapper>
           );
         }
         return (
-          <div className="px-4">
-            <div className="max-w-[800px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-              <QuizGame
-                key={`vocab-${selectedVocab}`}
-                questions={getVocabQuestions()}
-                onAnswer={handleAnswer}
-                onBack={() => setSelectedVocab(null)}
-              />
-            </div>
-          </div>
+          <ContentWrapper narrow>
+            <QuizGame
+              key={`vocab-${selectedVocab}`}
+              questions={getVocabQuestions()}
+              onAnswer={handleAnswer}
+              onBack={() => setSelectedVocab(null)}
+            />
+          </ContentWrapper>
         );
 
       case "grammar":
         if (!selectedGrammar) {
           return (
-            <div className="px-4">
-              <div className="max-w-[1200px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-                <ExerciseSelector
-                  title="Выберите упражнение по грамматике"
-                  items={[
-                    { key: "grammar1", label: "✏️ Grammar 1 — Will / Going to" },
-                    { key: "grammar2", label: "✏️ Grammar 2 — Present Continuous vs Simple" },
-                    { key: "grammar3", label: "✏️ Grammar 3 — Would like • Need/Want • Modals • There is/are • etc." },
-                  ]}
-                  onSelect={(key: GrammarKey) => setSelectedGrammar(key)}
-                  onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
-                />
-              </div>
-            </div>
+            <ContentWrapper>
+              <ExerciseSelector
+             title="Выберите упражнение по грамматике"
+             items={[
+             { key: "grammar1", label: "Grammar 1 — Will / Going to", icon: "✏️" },
+             { key: "grammar2", label: "Grammar 2 — Present Continuous vs Simple", icon: "✏️" },
+             { key: "grammar3", label: "Grammar 3 — Would like • Need/Want • Modals • There is/are • etc.", icon: "✏️" },
+             ]}
+             onSelect={(key: GrammarKey) => setSelectedGrammar(key)}
+             onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
+             />
+
+            </ContentWrapper>
           );
         }
         return (
-          <div className="px-4">
-            <div className="max-w-[800px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-              <QuizGame
-                key={`grammar-${selectedGrammar}`}
-                questions={getGrammarQuestions()}
-                onAnswer={handleAnswer}
-                onBack={() => setSelectedGrammar(null)}
-              />
-            </div>
-          </div>
+          <ContentWrapper narrow>
+            <QuizGame
+              key={`grammar-${selectedGrammar}`}
+              questions={getGrammarQuestions()}
+              onAnswer={handleAnswer}
+              onBack={() => setSelectedGrammar(null)}
+            />
+          </ContentWrapper>
         );
 
       case "critical_thinking":
         return (
-          <div className="px-4">
-            <div className="max-w-[800px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-              <QuizGame
-                key="critical"
-                questions={criticalThinkingQuestions}
-                onAnswer={handleAnswer}
-                onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
-              />
-            </div>
-          </div>
+          <ContentWrapper narrow>
+            <QuizGame
+              key="critical"
+              questions={criticalThinkingQuestions}
+              onAnswer={handleAnswer}
+              onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
+            />
+          </ContentWrapper>
         );
 
       case "communication":
@@ -171,26 +180,22 @@ const App: React.FC = () => {
 
       case "boss":
         return (
-          <div className="px-4">
-            <div className="max-w-[800px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-              <BossChallenge
-                onAnswer={handleAnswer}
-                onBack={() => setGameState(p => ({ ...p, currentMode: "communication" }))}
-              />
-            </div>
-          </div>
+          <ContentWrapper narrow>
+            <BossChallenge
+              onAnswer={handleAnswer}
+              onBack={() => setGameState(p => ({ ...p, currentMode: "communication" }))}
+            />
+          </ContentWrapper>
         );
 
       case "client":
         return (
-          <div className="px-4">
-            <div className="max-w-[800px] mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100">
-              <ClientMeeting
-                onAnswer={handleAnswer}
-                onBack={() => setGameState(p => ({ ...p, currentMode: "communication" }))}
-              />
-            </div>
-          </div>
+          <ContentWrapper narrow>
+            <ClientMeeting
+              onAnswer={handleAnswer}
+              onBack={() => setGameState(p => ({ ...p, currentMode: "communication" }))}
+            />
+          </ContentWrapper>
         );
 
       default:
@@ -205,6 +210,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app min-h-screen p-5 sm:p-6 md:p-8 relative text-white">
+      {/* background blobs */}
       <div className="bg">
         <div className="blob b1" />
         <div className="blob b2" />
@@ -217,3 +223,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
