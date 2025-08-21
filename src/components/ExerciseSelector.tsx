@@ -16,20 +16,10 @@ const ExerciseSelector = <T extends string>({
   return (
     <div className="relative z-20 w-full max-w-[1100px] mx-auto rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,.22)] text-white p-5">
       {/* Header */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <button
-          type="button"
-          onClick={onBack}
-          className="mt-2 inline-flex items-center gap-2 rounded-lg px-2 py-1 text-slate-200 hover:text-white hover:bg-white/10 transition"
-        >
-          <span aria-hidden>←</span>
-          Назад
-        </button>
-      </div>
+      <h2 className="text-lg font-semibold mb-4">{title}</h2>
 
       {/* List */}
-      <ul className="space-y-2">
+      <ul className="space-y-2 mb-6">
         {items.map((it) => (
           <li key={it.key}>
             <button
@@ -48,10 +38,22 @@ const ExerciseSelector = <T extends string>({
           </li>
         )}
       </ul>
+      
+      <div className="pt-4 border-t border-white/10">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-slate-200 hover:text-white hover:bg-white/10 transition"
+        >
+          <span aria-hidden>←</span>
+          Назад
+        </button>
+      </div>
     </div>
   );
 };
 
 export default ExerciseSelector;
+
 
 
