@@ -59,7 +59,7 @@ const QuizGame: React.FC<QuizGameProps> = ({ questions, onAnswer, onBack }) => {
 
   if (!questions.length) {
     return (
-      <div className="rounded-2xl bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-white text-center">
+      <div className="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/10 p-6 text-white max-w-3xl mx-auto shadow-[0_10px_30px_rgba(0,0,0,.25)] min-h-[520px] transition-all duration-500">
         Нет вопросов.
         <button onClick={onBack} className="mt-4 px-4 py-2 rounded-lg bg-slate-600 hover:bg-slate-500">
           Вернуться
