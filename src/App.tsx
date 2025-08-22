@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import "./App.css";
 
@@ -27,10 +26,7 @@ type GrammarKey = "grammar1" | "grammar2" | "grammar3";
 
 const ContentWrapper: React.FC<{ children: React.ReactNode; narrow?: boolean }> = ({ children, narrow }) => (
   <div className="px-4">
-    <div
-      className={`mx-auto mt-6 rounded-[15px] bg-white/10 backdrop-blur-xl ring-1 ring-white/15 p-6 text-slate-100 
-                  ${narrow ? "max-w-[800px]" : "max-w-[1000px]"}`}
-    >
+    <div className={`mx-auto mt-6 ${narrow ? "max-w-[800px]" : "max-w-[1000px]"}`}>
       {children}
     </div>
   </div>
@@ -103,17 +99,17 @@ const App: React.FC = () => {
       case "vocabulary":
         if (!selectedVocab) {
           return (
-             <ContentWrapper>
-            <ExerciseSelector
-             title="Выберите упражнение по лексике"
-             items={[
-             { key: "vocab1", label: "Vocabulary 1 — Business Center", icon: "📘" },
-             { key: "vocab2", label: "Vocabulary 2 — Management & Customers", icon: "📗" },
-             { key: "vocab3", label: "Vocabulary 3 — Strategy & Admin", icon: "📙" },
-             ]}
-             onSelect={(key: VocabKey) => setSelectedVocab(key)}
-             onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
-             />
+            <ContentWrapper>
+              <ExerciseSelector
+                title="Выберите упражнение по лексике"
+                items={[
+                  { key: "vocab1", label: "Vocabulary 1 — Business Center", icon: "📘" },
+                  { key: "vocab2", label: "Vocabulary 2 — Management & Customers", icon: "📗" },
+                  { key: "vocab3", label: "Vocabulary 3 — Strategy & Admin", icon: "📙" },
+                ]}
+                onSelect={(key: VocabKey) => setSelectedVocab(key)}
+                onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
+              />
             </ContentWrapper>
           );
         }
@@ -133,15 +129,15 @@ const App: React.FC = () => {
           return (
             <ContentWrapper>
               <ExerciseSelector
-             title="Выберите упражнение по грамматике"
-             items={[
-             { key: "grammar1", label: "Grammar 1 — Will / Going to", icon: "✏️" },
-             { key: "grammar2", label: "Grammar 2 — Present Continuous vs Simple", icon: "✏️" },
-             { key: "grammar3", label: "Grammar 3 — Would like • Need/Want • Modals • There is/are • etc.", icon: "✏️" },
-             ]}
-             onSelect={(key: GrammarKey) => setSelectedGrammar(key)}
-             onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
-             />
+                title="Выберите упражнение по грамматике"
+                items={[
+                  { key: "grammar1", label: "Grammar 1 — Will / Going to", icon: "✏️" },
+                  { key: "grammar2", label: "Grammar 2 — Present Continuous vs Simple", icon: "✏️" },
+                  { key: "grammar3", label: "Grammar 3 — Would like • Need/Want • Modals • There is/are • etc.", icon: "✏️" },
+                ]}
+                onSelect={(key: GrammarKey) => setSelectedGrammar(key)}
+                onBack={() => setGameState(p => ({ ...p, currentMode: "main" }))}
+              />
             </ContentWrapper>
           );
         }
@@ -215,4 +211,5 @@ const App: React.FC = () => {
 };
 
 export default App;
+
 
